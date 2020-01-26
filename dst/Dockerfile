@@ -45,7 +45,7 @@ ENTRYPOINT ${STEAMCMDDIR}/steamcmd.sh \
     +force_install_dir ${STEAMAPPDIR} \
     +app_update ${STEAMAPPID} \
     +quit \
-  && ${STEAMAPPDIR}/run_dedicated_servers.sh \
+  && ${STEAMAPPDIR}/bin/dontstarve_dedicated_server_nullrenderer \
     -console \
     -cluster "${CLUSTERNAME}" \
     -shard Master
