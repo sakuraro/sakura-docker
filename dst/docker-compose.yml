@@ -1,8 +1,11 @@
 version: '3'
-  services:
-    dst-dedicated:
-      build: .
-      network_mode: "host"
-      volume:
-        - ./DoNotStarveTogether:/home/steam/.klei/DoNotStarveTogether
-        - steamapp:/home/steam/dontstarvetogether_dedicated_server
+services:
+  dst-dedicated:
+    build: .
+    network_mode: "host"
+    volumes:
+      - ./DoNotStarveTogether:/home/steam/.klei/DoNotStarveTogether
+      - steamapp:/home/steam/dontstarvetogether_dedicated_server
+
+volumes:
+  steamapp:
