@@ -1,7 +1,8 @@
 #!/bin/bash
 
 steamcmd_dir="$HOME/steamcmd"
-install_dir="$HOME/dontstarvetogether_dedicated_server"
+steamapp_id="343050"
+steamapp_dir="$HOME/dontstarvetogether_dedicated_server"
 cluster_name="MyDediServer"
 dontstarve_dir="$HOME/.klei/DoNotStarveTogether"
 
@@ -26,16 +27,16 @@ check_for_file "$dontstarve_dir/$cluster_name/cluster_token.txt"
 check_for_file "$dontstarve_dir/$cluster_name/Master/server.ini"
 check_for_file "$dontstarve_dir/$cluster_name/Caves/server.ini"
 
-./steamcmd.sh +force_install_dir "$install_dir" +login anonymous +app_update 343050 validate +quit
+./steamcmd.sh +force_install_dir "$steamapp_dir" +login anonymous +app_update "$steamapp_id" validate +quit
 
-check_for_file "$install_dir/bin"
+check_for_file "$steamapp_dir/bin"
 
-cd "$install_dir/bin" || fail
+cd "$steamapp_dir/bin" || fail
 
 run_shared=(./dontstarve_dedicated_server_nullrenderer)
 run_shared+=(-console)
 run_shared+=(-cluster "$cluster_name")
-run_shared+=(-monitor_parent_process $$)
+# run_shared+=(-monitor_parent_process $$)
 
-"${run_shared[@]}" -shard Caves  | sed 's/^/Caves:  /' &
-"${run_shared[@]}" -shard Master | sed 's/^/Master: /'
+# "${run_shared[@]}" -shard Caves  | sed 's/^/Caves:  /' &
+"${run_shared[@]}" -shard Master

@@ -1,8 +1,9 @@
-FROM cm2network/steamcmd:root
+FROM debian:buster-slim
 
+ENV STEAMCMDDIR /home/steam/steamcmd
 ENV STEAMAPPID 343050
-ENV STEAMAPPDIR /home/steam/dontstarvetogether_dedicated_server
-ENV DONTSTARVEDIR /home/steam/.klei/DoNotStarveTogether
+ENV STEAMAPPDIR /home/steam/dst
+ENV DSTCONFIGDIR /home/steam/.klei/DoNotStarveTogether
 
 RUN set -x \
     && dpkg --add-architecture i386 \
@@ -10,22 +11,18 @@ RUN set -x \
     && apt-get install -y --no-install-recommends --no-install-suggests \
       wget \
       ca-certificates \
+      libstdc++6:i386 \
+      libgcc1:i386 \
       libcurl4-gnutls-dev:i386 \
-    && apt-get autoremove --purge -y \
-      wget \
-    && apt-get clean autoclean \
-    && apt-get autoremove -y \
-    && rm -rf /var/lib/apt/lists/*
-    
-RUN su steam -c \
-      "${STEAMCMDDIR}/steamcmd.sh \
-        +login anonymous \
-        +force_install_dir ${STEAMAPPDIR} \
-        +app_update ${STEAMAPPID} validate \
-        +quit "
+    && useradd -m steam
 
 USER steam
-WORKDIR $STEAMAPPDIR
-VOLUME ["${STEAMAPPDIR}", "${DONTSTARVEDIR}"]
+WORKDIR /home/steam
 
-ENTRYPOINT ${STEAMAPPDIR}/bin/dontstarve_dedicated_server_nullrenderer
+RUN mkdir -p ${STEAMCMDDIR} \
+    && mkdir -p ${STEAMAPPDIR} \
+    && mkdir -p ${DSTCONFIGDIR} \
+    && cd ${STEAMCMDDIR} \
+    && wget -qO- 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz' | tar zxf -
+
+VOLUME ["${STEAMCMDDIR}", "${STEAMAPPDIR}", "${DSTCONFIGDIR}"]

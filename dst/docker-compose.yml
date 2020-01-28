@@ -5,7 +5,9 @@ services:
     network_mode: "host"
     volumes:
       - ./DoNotStarveTogether:/home/steam/.klei/DoNotStarveTogether
-      - steamapp:/home/steam/dontstarvetogether_dedicated_server
-
-volumes:
-  steamapp:
+      - ./dst:/home/steam/dst
+      - ./mods:/home/steam/mods
+      - ./run_dst_master.sh:/home/steam/run_dst_master.sh
+      - ./run_dst_caves.sh:/home/steam/run_dst_caves.sh
+      - ./update_dst.sh:/home/steam/update_dst.sh
+    command: ["./update_dst.sh"]
