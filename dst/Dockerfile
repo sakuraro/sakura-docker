@@ -1,9 +1,10 @@
-FROM debian:buster-slim
+FROM ubuntu
 
-ENV STEAMCMDDIR /home/steam/steamcmd
-ENV STEAMAPPID 343050
-ENV STEAMAPPDIR /home/steam/dst
-ENV DSTCONFIGDIR /home/steam/.klei/DoNotStarveTogether
+ENV STEAMCMDDIR="/home/steam/steamcmd" \
+    STEAMAPPID=343050 \
+    STEAMAPPDIR="/home/steam/dst" \
+    DSTCONFIGDIR="/home/steam/.klei/DoNotStarveTogether" \
+    MODCONFIGDIR="/home/steam/mods"
 
 RUN set -x \
     && dpkg --add-architecture i386 \
@@ -17,12 +18,18 @@ RUN set -x \
     && useradd -m steam
 
 USER steam
-WORKDIR /home/steam
+WORKDIR ${STEAMAPPDIR}/bin
+VOLUME ["${STEAMCMDDIR}", "${STEAMAPPDIR}", "${DSTCONFIGDIR}", "${MODCONFIGDIR}"]
 
-RUN mkdir -p ${STEAMCMDDIR} \
-    && mkdir -p ${STEAMAPPDIR} \
-    && mkdir -p ${DSTCONFIGDIR} \
-    && cd ${STEAMCMDDIR} \
+RUN cd ${STEAMCMDDIR} \
     && wget -qO- 'https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz' | tar zxf -
+    && ./steamcmd.sh +login anonymous \
+      +force_install_dir ${STEAMAPPDIR} \
+      +app_update ${STEAMAPPID} validate \
+      +quit \
+    && rm -f ${STEAMAPPDIR}/mods/dedicated_server_mods_setup.lua \
+    && cp -f ${MODCONFIGDIR}/dedicated_server_mods_setup.lua ${STEAMAPPDIR}/mods \
+    && cd ${STEAMAPPDIR}/bin \
+    && ./dontstarve_dedicated_server_nullrenderer -only_update_server_mods
 
-VOLUME ["${STEAMCMDDIR}", "${STEAMAPPDIR}", "${DSTCONFIGDIR}"]
+CMD ["./dontstarve_dedicated_server_nullrenderer", "-console", "-cluster", "Cluster_1", "-shard", "Master"]
